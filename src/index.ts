@@ -10,7 +10,7 @@ import webgl_08_05_3d_textures_mips_tri_linear from './8_Textures/05_3d_textures
 import webgl_08_06_3d_textures_good_npot from './8_Textures/06_3d_textures_good_npot'
 import webgl_08_07_3d_textures_texture_atlas from './8_Textures/07_3d_textures_texture_atlas'
 import webgl_08_08_data_texture_3x2 from './8_Textures/08_data_texture_3x2'
-
+import webgl_08_09_2_textures from './8_Textures/09_2_textures'
 
 export {
     webgl_01_fundamental,
@@ -25,4 +25,5 @@ export {
     webgl_08_06_3d_textures_good_npot,
     webgl_08_07_3d_textures_texture_atlas,
     webgl_08_08_data_texture_3x2,
+    webgl_08_09_2_textures,
 }
