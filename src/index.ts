@@ -11,6 +11,13 @@ import webgl_08_06_3d_textures_good_npot from './8_Textures/06_3d_textures_good_
 import webgl_08_07_3d_textures_texture_atlas from './8_Textures/07_3d_textures_texture_atlas'
 import webgl_08_08_data_texture_3x2 from './8_Textures/08_data_texture_3x2'
 import webgl_08_09_2_textures from './8_Textures/09_2_textures'
+import webgl_08_11_clipspace_rectangles from './8_Textures/11_clipspace_rectangles'
+import webgl_08_12_clipspace_rectangles_with_varying from './8_Textures/12_clipspace_rectangles_with_varying'
+import webgl_08_13_clipspace_rectangles_with_varying_non_1_w from './8_Textures/13_clipspace_rectangles_with_varying_non_1_w'
+import webgl_08_14_clipspace_rectangles_with_varying_non_1_w_repeat from './8_Textures/14_clipspace_rectangles_with_varying_non_1_w_repeat'
+import webgl_08_15_perspective_correct_cube from './8_Textures/15_perspective_correct_cube'
+import webgl_08_16_non_perspective_correct_cube from './8_Textures/16_non_perspective_correct_cube'
+import webgl_08_17_planar_projection_setup from './8_Textures/17_planar_projection_setup'
 
 export {
     webgl_01_fundamental,
@@ -26,4 +33,11 @@ export {
     webgl_08_07_3d_textures_texture_atlas,
     webgl_08_08_data_texture_3x2,
     webgl_08_09_2_textures,
+    webgl_08_11_clipspace_rectangles,
+    webgl_08_12_clipspace_rectangles_with_varying,
+    webgl_08_13_clipspace_rectangles_with_varying_non_1_w,
+    webgl_08_14_clipspace_rectangles_with_varying_non_1_w_repeat,
+    webgl_08_15_perspective_correct_cube,
+    webgl_08_16_non_perspective_correct_cube,
+    webgl_08_17_planar_projection_setup
 }

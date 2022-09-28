@@ -1,13 +1,13 @@
-type Matrix4 = Float32Array | number[];
-type Vector4 = Float32Array | number[];
-type Vector3 = Float32Array | number[];
+export type Matrix4 = Float32Array | number[];
+export type Vector4 = Float32Array | number[];
+export type Vector3 = Float32Array | number[];
 
 /**
-   * Makes an identity matrix.
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Makes an identity matrix.
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
 function identity(dst?: Matrix4): Matrix4 {
     dst = dst || new Float32Array(16);
 
@@ -32,15 +32,47 @@ function identity(dst?: Matrix4): Matrix4 {
 }
 
 /**
-   * Mutliply by translation matrix.
-   * @param {Matrix4} m matrix to multiply
-   * @param {number} tx x translation.
-   * @param {number} ty y translation.
-   * @param {number} tz z translation.
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Makes a translation matrix
+ * @param {number} tx x translation.
+ * @param {number} ty y translation.
+ * @param {number} tz z translation.
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
+function translation(tx: number, ty: number, tz: number, dst?: Matrix4): Matrix4 {
+    dst = dst || new Float32Array(16);
+
+    dst[0] = 1;
+    dst[1] = 0;
+    dst[2] = 0;
+    dst[3] = 0;
+    dst[4] = 0;
+    dst[5] = 1;
+    dst[6] = 0;
+    dst[7] = 0;
+    dst[8] = 0;
+    dst[9] = 0;
+    dst[10] = 1;
+    dst[11] = 0;
+    dst[12] = tx;
+    dst[13] = ty;
+    dst[14] = tz;
+    dst[15] = 1;
+
+    return dst;
+}
+
+/**
+ * Mutliply by translation matrix.
+ * @param {Matrix4} m matrix to multiply
+ * @param {number} tx x translation.
+ * @param {number} ty y translation.
+ * @param {number} tz z translation.
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
 function translate(m: Matrix4, tx: number, ty: number, tz: number, dst?: Matrix4): Matrix4 {
     // This is the optimized version of
     // return multiply(m, translation(tx, ty, tz), dst);
@@ -106,24 +138,75 @@ function transformVector(m: Matrix4, v: Vector4, dst?: Vector4): Vector4 {
 }
 
 /**
-   * Computes a 4-by-4 perspective transformation matrix given the angular height
-   * of the frustum, the aspect ratio, and the near and far clipping planes.  The
-   * arguments define a frustum extending in the negative z direction.  The given
-   * angle is the vertical angle of the frustum, and the horizontal angle is
-   * determined to produce the given aspect ratio.  The arguments near and far are
-   * the distances to the near and far clipping planes.  Note that near and far
-   * are not z coordinates, but rather they are distances along the negative
-   * z-axis.  The matrix generated sends the viewing frustum to the unit box.
-   * We assume a unit box extending from -1 to 1 in the x and y dimensions and
-   * from -1 to 1 in the z dimension.
-   * @param {number} fieldOfViewInRadians field of view in y axis.
-   * @param {number} aspect aspect of viewport (width / height)
-   * @param {number} near near Z clipping plane
-   * @param {number} far far Z clipping plane
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Takes a 4-by-4 matrix and a vector with 3 entries,
+ * interprets the vector as a point, transforms that point by the matrix, and
+ * returns the result as a vector with 3 entries.
+ * @param {Matrix4} m The matrix.
+ * @param {Vector3} v The point.
+ * @param {Vector4} dst optional vector4 to store result
+ * @return {Vector4} dst or new Vector4 if not provided
+ * @memberOf module:webgl-3d-math
+ */
+function transformPoint(m: Matrix4, v: Vector3, dst?: Vector4): Vector4 {
+    dst = dst || new Float32Array(3);
+    var v0 = v[0];
+    var v1 = v[1];
+    var v2 = v[2];
+    var d = v0 * m[0 * 4 + 3] + v1 * m[1 * 4 + 3] + v2 * m[2 * 4 + 3] + m[3 * 4 + 3];
+
+    dst[0] = (v0 * m[0 * 4 + 0] + v1 * m[1 * 4 + 0] + v2 * m[2 * 4 + 0] + m[3 * 4 + 0]) / d;
+    dst[1] = (v0 * m[0 * 4 + 1] + v1 * m[1 * 4 + 1] + v2 * m[2 * 4 + 1] + m[3 * 4 + 1]) / d;
+    dst[2] = (v0 * m[0 * 4 + 2] + v1 * m[1 * 4 + 2] + v2 * m[2 * 4 + 2] + m[3 * 4 + 2]) / d;
+
+    return dst;
+}
+
+/**
+ * Takes a 4-by-4 matrix and a vector with 3 entries, interprets the vector as a
+ * direction, transforms that direction by the matrix, and returns the result;
+ * assumes the transformation of 3-dimensional space represented by the matrix
+ * is parallel-preserving, i.e. any combination of rotation, scaling and
+ * translation, but not a perspective distortion. Returns a vector with 3
+ * entries.
+ * @param {Matrix4} m The matrix.
+ * @param {Vector3} v The direction.
+ * @param {Vector4} dst optional vector4 to store result
+ * @return {Vector4} dst or new Vector4 if not provided
+ * @memberOf module:webgl-3d-math
+ */
+function transformDirection(m: Matrix4, v: Vector3, dst?: Vector4): Vector4 {
+    dst = dst || new Float32Array(3);
+
+    var v0 = v[0];
+    var v1 = v[1];
+    var v2 = v[2];
+
+    dst[0] = v0 * m[0 * 4 + 0] + v1 * m[1 * 4 + 0] + v2 * m[2 * 4 + 0];
+    dst[1] = v0 * m[0 * 4 + 1] + v1 * m[1 * 4 + 1] + v2 * m[2 * 4 + 1];
+    dst[2] = v0 * m[0 * 4 + 2] + v1 * m[1 * 4 + 2] + v2 * m[2 * 4 + 2];
+
+    return dst;
+}
+
+/**
+ * Computes a 4-by-4 perspective transformation matrix given the angular height
+ * of the frustum, the aspect ratio, and the near and far clipping planes.  The
+ * arguments define a frustum extending in the negative z direction.  The given
+ * angle is the vertical angle of the frustum, and the horizontal angle is
+ * determined to produce the given aspect ratio.  The arguments near and far are
+ * the distances to the near and far clipping planes.  Note that near and far
+ * are not z coordinates, but rather they are distances along the negative
+ * z-axis.  The matrix generated sends the viewing frustum to the unit box.
+ * We assume a unit box extending from -1 to 1 in the x and y dimensions and
+ * from -1 to 1 in the z dimension.
+ * @param {number} fieldOfViewInRadians field of view in y axis.
+ * @param {number} aspect aspect of viewport (width / height)
+ * @param {number} near near Z clipping plane
+ * @param {number} far far Z clipping plane
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
 function perspective(fieldOfViewInRadians: number, aspect: number, near: number, far: number, dst?: Matrix4): Matrix4 {
     dst = dst || new Float32Array(16);
     var f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
@@ -150,12 +233,12 @@ function perspective(fieldOfViewInRadians: number, aspect: number, near: number,
 }
 
 /**
-   * normalizes a vector.
-   * @param {Vector3} v vector to normalzie
-   * @param {Vector3} dst optional vector3 to store result
-   * @return {Vector3} dst or new Vector3 if not provided
-   * @memberOf module:webgl-3d-math
-   */
+ * normalizes a vector.
+ * @param {Vector3} v vector to normalzie
+ * @param {Vector3} dst optional vector3 to store result
+ * @return {Vector3} dst or new Vector3 if not provided
+ * @memberOf module:webgl-3d-math
+ */
 function normalize(v: Vector3, dst?: Vector3): Vector3 {
     dst = dst || new Float32Array(3);
     var length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
@@ -184,13 +267,13 @@ function subtractVectors(a: Vector3, b: Vector3, dst?: Vector3): Vector3 {
 }
 
 /**
-   * Computes the cross product of 2 vectors3s
-   * @param {Vector3} a a
-   * @param {Vector3} b b
-   * @param {Vector3} dst optional vector3 to store result
-   * @return {Vector3} dst or new Vector3 if not provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Computes the cross product of 2 vectors3s
+ * @param {Vector3} a a
+ * @param {Vector3} b b
+ * @param {Vector3} dst optional vector3 to store result
+ * @return {Vector3} dst or new Vector3 if not provided
+ * @memberOf module:webgl-3d-math
+ */
 function cross(a: Vector3, b: Vector3, dst?: Vector3): Vector3 {
     dst = dst || new Float32Array(3);
     dst[0] = a[1] * b[2] - a[2] * b[1];
@@ -200,17 +283,17 @@ function cross(a: Vector3, b: Vector3, dst?: Vector3): Vector3 {
 }
 
 /**
-   * Creates a lookAt matrix.
-   * This is a world matrix for a camera. In other words it will transform
-   * from the origin to a place and orientation in the world. For a view
-   * matrix take the inverse of this.
-   * @param {Vector3} cameraPosition position of the camera
-   * @param {Vector3} target position of the target
-   * @param {Vector3} up direction
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Creates a lookAt matrix.
+ * This is a world matrix for a camera. In other words it will transform
+ * from the origin to a place and orientation in the world. For a view
+ * matrix take the inverse of this.
+ * @param {Vector3} cameraPosition position of the camera
+ * @param {Vector3} target position of the target
+ * @param {Vector3} up direction
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
 function lookAt(cameraPosition: Vector3, target: Vector3, up: Vector3, dst?: Matrix4): Matrix4 {
     dst = dst || new Float32Array(16);
     var zAxis = normalize(
@@ -239,12 +322,12 @@ function lookAt(cameraPosition: Vector3, target: Vector3, up: Vector3, dst?: Mat
 }
 
 /**
-   * Computes the inverse of a matrix.
-   * @param {Matrix4} m matrix to compute inverse of
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Computes the inverse of a matrix.
+ * @param {Matrix4} m matrix to compute inverse of
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
 function inverse(m: Matrix4, dst?: Matrix4): Matrix4 {
     dst = dst || new Float32Array(16);
     var m00 = m[0 * 4 + 0];
@@ -331,16 +414,16 @@ function inverse(m: Matrix4, dst?: Matrix4): Matrix4 {
     return dst;
 }
 /**
-   * Takes two 4-by-4 matrices, a and b, and computes the product in the order
-   * that pre-composes b with a.  In other words, the matrix returned will
-   * transform by b first and then a.  Note this is subtly different from just
-   * multiplying the matrices together.  For given a and b, this function returns
-   * the same object in both row-major and column-major mode.
-   * @param {Matrix4} a A matrix.
-   * @param {Matrix4} b A matrix.
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   */
+ * Takes two 4-by-4 matrices, a and b, and computes the product in the order
+ * that pre-composes b with a.  In other words, the matrix returned will
+ * transform by b first and then a.  Note this is subtly different from just
+ * multiplying the matrices together.  For given a and b, this function returns
+ * the same object in both row-major and column-major mode.
+ * @param {Matrix4} a A matrix.
+ * @param {Matrix4} b A matrix.
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ */
 function multiply(a: Matrix4, b: Matrix4, dst?: Matrix4): Matrix4 {
     dst = dst || new Float32Array(16);
     var b00 = b[0 * 4 + 0];
@@ -395,13 +478,13 @@ function multiply(a: Matrix4, b: Matrix4, dst?: Matrix4): Matrix4 {
 }
 
 /**
-   * Multiply by an x rotation matrix
-   * @param {Matrix4} m matrix to multiply
-   * @param {number} angleInRadians amount to rotate
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Multiply by an x rotation matrix
+ * @param {Matrix4} m matrix to multiply
+ * @param {number} angleInRadians amount to rotate
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
 function xRotate(m: Matrix4, angleInRadians: number, dst?: Matrix4): Matrix4 {
     // this is the optimized version of
     // return multiply(m, xRotation(angleInRadians), dst);
@@ -473,13 +556,13 @@ function yRotation(angleInRadians: number, dst?: Matrix4): Matrix4 {
     return dst;
 }
 /**
-   * Multiply by an y rotation matrix
-   * @param {Matrix4} m matrix to multiply
-   * @param {number} angleInRadians amount to rotate
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Multiply by an y rotation matrix
+ * @param {Matrix4} m matrix to multiply
+ * @param {number} angleInRadians amount to rotate
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
 function yRotate(m: Matrix4, angleInRadians: number, dst?: Matrix4): Matrix4 {
     // this is the optimized verison of
     // return multiply(m, yRotation(angleInRadians), dst);
@@ -520,13 +603,13 @@ function yRotate(m: Matrix4, angleInRadians: number, dst?: Matrix4): Matrix4 {
 }
 
 /**
-   * Multiply by an z rotation matrix
-   * @param {Matrix4} m matrix to multiply
-   * @param {number} angleInRadians amount to rotate
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Multiply by an z rotation matrix
+ * @param {Matrix4} m matrix to multiply
+ * @param {number} angleInRadians amount to rotate
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
  function zRotate(m: Matrix4, angleInRadians: number, dst?: Matrix4): Matrix4 {
     // This is the optimized verison of
     // return multiply(m, zRotation(angleInRadians), dst);
@@ -567,23 +650,23 @@ function yRotate(m: Matrix4, angleInRadians: number, dst?: Matrix4): Matrix4 {
   }
 
 /**
-   * Computes a 4-by-4 orthographic projection matrix given the coordinates of the
-   * planes defining the axis-aligned, box-shaped viewing volume.  The matrix
-   * generated sends that box to the unit box.  Note that although left and right
-   * are x coordinates and bottom and top are y coordinates, near and far
-   * are not z coordinates, but rather they are distances along the negative
-   * z-axis.  We assume a unit box extending from -1 to 1 in the x and y
-   * dimensions and from -1 to 1 in the z dimension.
-   * @param {number} left The x coordinate of the left plane of the box.
-   * @param {number} right The x coordinate of the right plane of the box.
-   * @param {number} bottom The y coordinate of the bottom plane of the box.
-   * @param {number} top The y coordinate of the right plane of the box.
-   * @param {number} near The negative z coordinate of the near plane of the box.
-   * @param {number} far The negative z coordinate of the far plane of the box.
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Computes a 4-by-4 orthographic projection matrix given the coordinates of the
+ * planes defining the axis-aligned, box-shaped viewing volume.  The matrix
+ * generated sends that box to the unit box.  Note that although left and right
+ * are x coordinates and bottom and top are y coordinates, near and far
+ * are not z coordinates, but rather they are distances along the negative
+ * z-axis.  We assume a unit box extending from -1 to 1 in the x and y
+ * dimensions and from -1 to 1 in the z dimension.
+ * @param {number} left The x coordinate of the left plane of the box.
+ * @param {number} right The x coordinate of the right plane of the box.
+ * @param {number} bottom The y coordinate of the bottom plane of the box.
+ * @param {number} top The y coordinate of the right plane of the box.
+ * @param {number} near The negative z coordinate of the near plane of the box.
+ * @param {number} far The negative z coordinate of the far plane of the box.
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
 function orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number, dst?: Matrix4): Matrix4 {
     dst = dst || new Float32Array(16);
 
@@ -608,15 +691,15 @@ function orthographic(left: number, right: number, bottom: number, top: number, 
 }
 
 /**
-   * Multiply by a scaling matrix
-   * @param {Matrix4} m matrix to multiply
-   * @param {number} sx x scale.
-   * @param {number} sy y scale.
-   * @param {number} sz z scale.
-   * @param {Matrix4} [dst] optional matrix to store result
-   * @return {Matrix4} dst or a new matrix if none provided
-   * @memberOf module:webgl-3d-math
-   */
+ * Multiply by a scaling matrix
+ * @param {Matrix4} m matrix to multiply
+ * @param {number} sx x scale.
+ * @param {number} sy y scale.
+ * @param {number} sz z scale.
+ * @param {Matrix4} [dst] optional matrix to store result
+ * @return {Matrix4} dst or a new matrix if none provided
+ * @memberOf module:webgl-3d-math
+ */
 function scale(m: Matrix4, sx: number, sy: number, sz: number, dst?: Matrix4): Matrix4 {
     // This is the optimized verison of
     // return multiply(m, scaling(sx, sy, sz), dst);
@@ -648,8 +731,11 @@ function scale(m: Matrix4, sx: number, sy: number, sz: number, dst?: Matrix4): M
 
 export default {
     identity,
+    translation,
     translate,
     transformVector,
+    transformPoint,
+    transformDirection,
     perspective,
     lookAt,
     inverse,
