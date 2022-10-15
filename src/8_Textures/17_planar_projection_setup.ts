@@ -6,29 +6,29 @@ import myMath from "../resources/myMath";
 
 const vertexShader3d = `
 attribute vec4 a_position;
-attribute vec2 a_texCoord;
+attribute vec2 a_texcoord;
 
 uniform mat4 u_projection;
 uniform mat4 u_view;
 uniform mat4 u_world;
 
-varying vec2 v_texCoord;
+varying vec2 v_texcoord;
 
 void main(){
     gl_Position= u_projection * u_view * u_world * a_position;
-    v_texCoord = a_texCoord;
+    v_texcoord = a_texcoord;
 }`;
 
 const fragmentShader3d = `
 precision mediump float;
 
-varying vec2 v_texCoord;
+varying vec2 v_texcoord;
 
 uniform vec4 u_colorMult;
 uniform sampler2D u_texture;
 
 void main(){
-    gl_FragColor = texture2D(u_texture, v_texCoord) * u_colorMult;
+    gl_FragColor = texture2D(u_texture, v_texcoord) * u_colorMult;
 }`
 
 export default function main() {

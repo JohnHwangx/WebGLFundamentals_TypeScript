@@ -18,6 +18,18 @@ import webgl_08_14_clipspace_rectangles_with_varying_non_1_w_repeat from './8_Te
 import webgl_08_15_perspective_correct_cube from './8_Textures/15_perspective_correct_cube'
 import webgl_08_16_non_perspective_correct_cube from './8_Textures/16_non_perspective_correct_cube'
 import webgl_08_17_planar_projection_setup from './8_Textures/17_planar_projection_setup'
+import webgl_08_18_planer_projection from './8_Textures/18_planer_projection'
+import webgl_08_19_planar_projection_with_lines from './8_Textures/19_planar_projection_with_lines'
+import webgl_08_20_planar_projection_with_projection_matrix_0_to_1 from './8_Textures/20_planar_projection_with_projection_matrix_0_to_1'
+import webgl_08_21_planar_projection_with_projection_matrix from './8_Textures/21_planar_projection_with_projection_matrix'
+import webgl_09_1_render_to_texture from './9_Rendering To a Texture/1_render_to_texture'
+import webgl_09_2_render_to_texture_3_cubes_no_depth_buffer from './9_Rendering To a Texture/2_render_to_texture_3_cubes_no_depth_buffer'
+import webgl_09_3_render_to_texture_3_cubes_with_depth_buffer from './9_Rendering To a Texture/3_render_to_texture_3_cubes_with_depth_buffer'
+import webgl_10_1_shadows_depth_texture from './A_Shadows/1_shadows_depth_texture'
+import webgl_10_2_shadows_basic from './A_Shadows/2_shadows_basic'
+import webgl_10_3_shadows_basic_w_bias from './A_Shadows/3_shadows_basic_w_bias'
+import webgl_10_4_shadows_w_spot_light from './A_Shadows/4_shadows_w_spot_light'
+import webgl_10_5_shadows_w_directional_light from './A_Shadows/5_shadows_w_directional_light'
 
 export {
     webgl_01_fundamental,
@@ -39,5 +51,17 @@ export {
     webgl_08_14_clipspace_rectangles_with_varying_non_1_w_repeat,
     webgl_08_15_perspective_correct_cube,
     webgl_08_16_non_perspective_correct_cube,
-    webgl_08_17_planar_projection_setup
+    webgl_08_17_planar_projection_setup,
+    webgl_08_18_planer_projection,
+    webgl_08_19_planar_projection_with_lines,
+    webgl_08_20_planar_projection_with_projection_matrix_0_to_1,
+    webgl_08_21_planar_projection_with_projection_matrix,
+    webgl_09_1_render_to_texture,
+    webgl_09_2_render_to_texture_3_cubes_no_depth_buffer,
+    webgl_09_3_render_to_texture_3_cubes_with_depth_buffer,
+    webgl_10_1_shadows_depth_texture,
+    webgl_10_2_shadows_basic,
+    webgl_10_3_shadows_basic_w_bias,
+    webgl_10_4_shadows_w_spot_light,
+    webgl_10_5_shadows_w_directional_light,
 }

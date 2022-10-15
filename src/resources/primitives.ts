@@ -1,5 +1,5 @@
 import m4, { Matrix4 } from "./m4";
-import webglUtils from "./webgl-utils";
+import webglUtils,{UniformValues, VertexValues} from "./webgl-utils";
 
 function applyFuncToV3Array(array:number[], matrix, fn) {
     var len = array.length;
@@ -51,7 +51,7 @@ function createSphereVertices(
     opt_startLatitudeInRadians?: number,
     opt_endLatitudeInRadians?: number,
     opt_startLongitudeInRadians?: number,
-    opt_endLongitudeInRadians?: number):any
+    opt_endLongitudeInRadians?: number): UniformValues
 {    
     if (subdivisionsAxis <= 0 || subdivisionsHeight <= 0) {
         throw Error('subdivisionAxis and subdivisionHeight must be > 0');
@@ -115,7 +115,7 @@ function createSphereVertices(
     return {
         position: positions,
         normal: normals,
-        texCoord: texCoords,
+        texcoord: texCoords,
         indices: indices,
     };
 }
@@ -187,11 +187,93 @@ function createPlaneVertices(
     var arrays = reorientVertices({
         position: positions,
         normal: normals,
-        texCoord: texcoords,
+        texcoord: texcoords,
         indices: indices,
     }, matrix);
     return arrays;
 }
+
+var CUBE_FACE_INDICES = [
+    [3, 7, 5, 1], // right
+    [6, 2, 0, 4], // left
+    [6, 7, 3, 2], // ??
+    [0, 1, 5, 4], // ??
+    [7, 6, 4, 5], // front
+    [2, 3, 1, 0], // back
+];
+
+/**
+   * Creates the vertices and indices for a cube. The
+   * cube will be created around the origin. (-size / 2, size / 2)
+   *
+   * @param {number} size Width, height and depth of the cube.
+   * @return {Object.<string, TypedArray>} The
+   *         created plane vertices.
+   * @memberOf module:primitives
+   */
+ function createCubeVertices(size: number) {
+    var k = size / 2;
+
+    var cornerVertices = [
+      [-k, -k, -k],
+      [+k, -k, -k],
+      [-k, +k, -k],
+      [+k, +k, -k],
+      [-k, -k, +k],
+      [+k, -k, +k],
+      [-k, +k, +k],
+      [+k, +k, +k],
+    ];
+
+    var faceNormals = [
+      [+1, +0, +0],
+      [-1, +0, +0],
+      [+0, +1, +0],
+      [+0, -1, +0],
+      [+0, +0, +1],
+      [+0, +0, -1],
+    ];
+
+    var uvCoords = [
+      [1, 0],
+      [0, 0],
+      [0, 1],
+      [1, 1],
+    ];
+
+    var numVertices = 6 * 4;
+    var positions = webglUtils.createAugmentedTypedArray(3, numVertices);
+    var normals   = webglUtils.createAugmentedTypedArray(3, numVertices);
+    var texCoords = webglUtils.createAugmentedTypedArray(2 , numVertices);
+    var indices   = webglUtils.createAugmentedTypedArray(3, 6 * 2, Uint16Array);
+
+    for (var f = 0; f < 6; ++f) {
+      var faceIndices = CUBE_FACE_INDICES[f];
+      for (var v = 0; v < 4; ++v) {
+        var position = cornerVertices[faceIndices[v]];
+        var normal = faceNormals[f];
+        var uv = uvCoords[v];
+
+        // Each face needs all four vertices because the normals and texture
+        // coordinates are not all the same.
+        positions.push(position);
+        normals.push(normal);
+        texCoords.push(uv);
+
+      }
+      // Two triangles make a square face.
+      var offset = 4 * f;
+      indices.push(offset + 0, offset + 1, offset + 2);
+      indices.push(offset + 0, offset + 2, offset + 3);
+    }
+
+    return {
+      position: positions,
+      normal: normals,
+      texcoord: texCoords,
+      indices: indices,
+    };
+  }
 
 /**
  * Reorients positions by the given matrix. In other words, it
@@ -201,7 +283,7 @@ function createPlaneVertices(
  * @return {number[]|TypedArray} the same array that was passed in
  * @memberOf module:primitives
  */
-function reorientPositions(array: number[], matrix: Matrix4) {
+function reorientPositions(array: number[], matrix: Matrix4){
     applyFuncToV3Array(array, matrix, m4.transformPoint);
     return array;
 }
@@ -261,7 +343,7 @@ function reorientVertices(arrays, matrix) {
  */
 function createBufferInfoFunc(fn:(...arg0: any)=>{}) {
     return function (gl: WebGLRenderingContext, ...args: number[]) {
-        var arrays = fn.apply(null, Array.prototype.slice.call(args, 0));
+        var arrays:VertexValues = fn.apply(null, Array.prototype.slice.call(args, 0));
         return webglUtils.createBufferInfoFromArrays(gl, arrays);
     };
 }
@@ -269,4 +351,5 @@ function createBufferInfoFunc(fn:(...arg0: any)=>{}) {
 export default {
     createSphereBufferInfo: createBufferInfoFunc(createSphereVertices),
     createPlaneBufferInfo: createBufferInfoFunc(createPlaneVertices),
+    createCubeBufferInfo: createBufferInfoFunc(createCubeVertices),
 }

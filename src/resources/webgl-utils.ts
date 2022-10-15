@@ -1,3 +1,16 @@
+export type ProgramInfo = {
+    program: WebGLProgram,
+    uniformSetters: Setters,
+    attribSetters: Setters
+};
+
+export type Setters = { [x: string]: Function };
+
+export type UniformValues = { [x: string]: any };
+
+export type VertexValues = { [x: string]: any };
+export type BufferInfos = { [x: string]: any };
+
 // export default class webglUtils {
 /**
    * Wrapped logging function.
@@ -103,13 +116,13 @@ function createShaderFromString(
 }
 
 /**
-   * Loads a shader.
-   * @param {WebGLRenderingContext} gl The WebGLRenderingContext to use.
-   * @param {string} shaderSource The shader source.
-   * @param {number} shaderType The type of shader.
-   * @param {module:webgl-utils.ErrorCallback} opt_errorCallback callback for errors.
-   * @return {WebGLShader} The created shader.
-   */
+ * Loads a shader.
+ * @param {WebGLRenderingContext} gl The WebGLRenderingContext to use.
+ * @param {string} shaderSource The shader source.
+ * @param {number} shaderType The type of shader.
+ * @param {module:webgl-utils.ErrorCallback} opt_errorCallback callback for errors.
+ * @return {WebGLShader} The created shader.
+ */
 function loadShader(
     gl: WebGLRenderingContext,
     shaderSource: string,
@@ -154,7 +167,8 @@ function createProgram(
     shaders: WebGLShader[],
     opt_attribs: string[],
     opt_locations: number[],
-    opt_errorCallback: (msg: string) => void) {
+    opt_errorCallback: (msg: string) => void)
+{
 
     var errFn = opt_errorCallback || error;
     var program = gl.createProgram();
@@ -176,7 +190,7 @@ function createProgram(
     if (!linked) {
         // something went wrong with the link
         var lastError = gl.getProgramInfoLog(program);
-        errFn("Error in program linking:" + lastError);
+        console.error("Error in program linking:" + lastError);
 
         gl.deleteProgram(program);
         return null;
@@ -208,7 +222,12 @@ function createProgram(
    * @memberOf module:webgl-utils
    */
 function createProgramInfo(
-    gl: WebGLRenderingContext, shaderSources: string[], opt_attribs?: string[], opt_locations?: number[], opt_errorCallback?: any): any {
+    gl: WebGLRenderingContext,
+    shaderSources: string[],
+    opt_attribs?: string[],
+    opt_locations?: number[],
+    opt_errorCallback?: any): ProgramInfo
+{
     // shaderSources = shaderSources.map(function (source) {
     //   var script = document.getElementById(source);
     //   return script ? script.text : source;
@@ -219,11 +238,13 @@ function createProgramInfo(
     }
     var uniformSetters = createUniformSetters(gl, program);
     var attribSetters = createAttributeSetters(gl, program);
-    return {
+
+    let programInfor: ProgramInfo = {
         program: program,
         uniformSetters: uniformSetters,
-        attribSetters: attribSetters,
+        attribSetters: attribSetters
     };
+    return programInfor;
 }
 
 /**
@@ -262,7 +283,7 @@ function createProgramInfo(
  * @param {module:webgl-utils.BufferInfo} buffers a BufferInfo as returned from `createBufferInfoFromArrays`.
  * @memberOf module:webgl-utils
  */
-function setBuffersAndAttributes(gl: WebGLRenderingContext, setters: any, buffers: any) {
+function setBuffersAndAttributes(gl: WebGLRenderingContext, setters: ProgramInfo | Setters, buffers: BufferInfos) {
     setAttributes(setters, buffers.attribs);
     if (buffers.indices) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
@@ -347,10 +368,11 @@ function setBuffersAndAttributes(gl: WebGLRenderingContext, setters: any, buffer
  *        uniforms.
  * @memberOf module:webgl-utils
  */
-function setUniforms(setters: any, values: any) {
-    setters = setters.uniformSetters || setters;
+function setUniforms(setters: ProgramInfo | Setters, values: UniformValues) {
+    let mySetters = setters.uniformSetters || setters;
+
     Object.keys(values).forEach(function (name) {
-        var setter = setters[name];
+        var setter = mySetters[name];
         if (setter) {
             setter(values[name]);
         }
@@ -366,11 +388,10 @@ function setUniforms(setters: any, values: any) {
  * @return {Object.<string, function>} an object with a setter for each attribute by name.
  * @memberOf module:webgl-utils
  */
-function createAttributeSetters(gl: WebGLRenderingContext, program: WebGLProgram): {} {
-    var attribSetters = {
-    };
+function createAttributeSetters(gl: WebGLRenderingContext, program: WebGLProgram): Setters {
+    var attribSetters:Setters = {};
 
-    function createAttribSetter(index: number) {
+    function createAttribSetter(index: number): Function {
         return function (b: any) {
             gl.bindBuffer(gl.ARRAY_BUFFER, b.buffer);
             gl.enableVertexAttribArray(index);
@@ -445,10 +466,11 @@ function createAttributeSetters(gl: WebGLRenderingContext, program: WebGLProgram
  * @memberOf module:webgl-utils
  * @deprecated use {@link module:webgl-utils.setBuffersAndAttributes}
  */
-function setAttributes(setters, attribs) {
-    setters = setters.attribSetters || setters;
+function setAttributes(setters:ProgramInfo | Setters, attribs:any) {
+    let mySetters = setters.attribSetters || setters;
+
     Object.keys(attribs).forEach(function (name) {
-        var setter = setters[name];
+        var setter = mySetters[name];
         if (setter) {
             setter(attribs[name]);
         }
@@ -465,7 +487,7 @@ function setAttributes(setters, attribs) {
    * @returns {Object.<string, function>} an object with a setter by name for each uniform
    * @memberOf module:webgl-utils
    */
-function createUniformSetters(gl: WebGLRenderingContext, program: WebGLProgram): any {
+function createUniformSetters(gl: WebGLRenderingContext, program: WebGLProgram): Setters {
     var textureUnit = 0;
 
     /**
@@ -475,7 +497,7 @@ function createUniformSetters(gl: WebGLRenderingContext, program: WebGLProgram):
      * @param {WebGLUniformInfo} uniformInfo
      * @returns {function} the created setter.
      */
-    function createUniformSetter(program: WebGLProgram, uniformInfo: WebGLActiveInfo): any {
+    function createUniformSetter(program: WebGLProgram, uniformInfo: WebGLActiveInfo): Function {
         var location = gl.getUniformLocation(program, uniformInfo.name);
         var type = uniformInfo.type;
         // Check if this uniform is an array
@@ -592,7 +614,7 @@ function createUniformSetters(gl: WebGLRenderingContext, program: WebGLProgram):
         throw ("unknown type: 0x" + type.toString(16)); // we should never get here.
     }
 
-    var uniformSetters = {};
+    var uniformSetters:Setters = {};
     var numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
 
     for (var ii = 0; ii < numUniforms; ++ii) {
@@ -694,9 +716,10 @@ function guessNumComponentsFromName(name: string, length?: number) {
  * @return {ArrayBuffer} A typed array.
  * @memberOf module:webgl-utils
  */
-function createAugmentedTypedArray(numComponents: number, numElements: number, opt_type?: any) {
+function createAugmentedTypedArray(numComponents: number, numElements: number, opt_type?: any): any {
     var Type = opt_type || Float32Array;
     return augmentTypedArray(new Type(numComponents * numElements), numComponents);
+    // return new AugmentTypedArray(numComponents, numElements, opt_type);
 }
 
 /**
@@ -710,6 +733,48 @@ function getNumElementsFromNonIndexedArrays(arrays) {
     } else {
         return array.data.length / array.numComponents;
     }
+}
+
+type TypedArray = any;
+
+export class AugmentTypedArray1{
+    private cursor: number;
+    public numComponents: number;
+    private arrayBuffer: any;
+
+    constructor(numComponents: number, numElements: number, opt_type?: TypedArray) {
+        this.cursor = 0;
+        this.numComponents = numComponents;
+        var Type = opt_type || Float32Array;
+        this.arrayBuffer = new Type(numComponents * numElements);       
+    }
+    
+    public push(...arg:any[]) {
+        for (var ii = 0; ii < arg.length; ++ii) {
+            var value = arg[ii];
+            if (value instanceof Array || (value.buffer && value.buffer instanceof ArrayBuffer)) {
+                for (var jj = 0; jj < value.length; ++jj) {
+                    this.arrayBuffer[this.cursor++] = value[jj];
+                }
+            } else {
+                this.arrayBuffer[this.cursor++] = value;
+            }
+        }
+    }
+
+    public reset(opt_index: number) {
+        this.cursor = opt_index || 0;
+    }
+
+    public get ArrayBuffer() : any {
+        return this.arrayBuffer;
+    }
+    
+
+    public get numElements() : number {
+        return this.arrayBuffer.length / this.numComponents | 0;
+    }
+    
 }
 
 // Add `push` to a typed array. It just keeps a 'cursor'
@@ -808,7 +873,7 @@ function makeTypedArray(array: any, name: string) {
  * @return {Object.<string, module:webgl-utils.AttribInfo>} the attribs
  * @memberOf module:webgl-utils
  */
-function createAttribsFromArrays(gl: WebGLRenderingContext, arrays: any, opt_mapping?: any):any {
+function createAttribsFromArrays(gl: WebGLRenderingContext, arrays: VertexValues, opt_mapping?: any):any {
     var mapping = opt_mapping || createMapping(arrays);
     var attribs = {};
     Object.keys(mapping).forEach(function (attribName) {
@@ -946,8 +1011,8 @@ function createAttribsFromArrays(gl: WebGLRenderingContext, arrays: any, opt_map
  * @return {module:webgl-utils.BufferInfo} A BufferInfo
  * @memberOf module:webgl-utils
  */
-function createBufferInfoFromArrays(gl: WebGLRenderingContext, arrays: any, opt_mapping?: any): any {
-    var bufferInfo: any = {
+function createBufferInfoFromArrays(gl: WebGLRenderingContext, arrays: any, opt_mapping?: any): BufferInfos {
+    var bufferInfo: BufferInfos = {
         attribs: createAttribsFromArrays(gl, arrays, opt_mapping),
     };
     var indices = arrays.indices;
@@ -976,7 +1041,7 @@ function createBufferInfoFromArrays(gl: WebGLRenderingContext, arrays: any, opt_
  * @param {number} [offset] An optional offset. Defaults to 0.
  * @memberOf module:webgl-utils
  */
-function drawBufferInfo(gl: WebGLRenderingContext, bufferInfo: any, primitiveType?: number, count?: number, offset?: number) {
+function drawBufferInfo(gl: WebGLRenderingContext, bufferInfo: BufferInfos, primitiveType?: number, count?: number, offset?: number) {
     var indices = bufferInfo.indices;
     primitiveType = primitiveType === undefined ? gl.TRIANGLES : primitiveType;
     var numElements = count === undefined ? bufferInfo.numElements : count;
