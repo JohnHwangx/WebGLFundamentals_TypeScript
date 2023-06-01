@@ -30,6 +30,16 @@ import webgl_10_2_shadows_basic from './A_Shadows/2_shadows_basic'
 import webgl_10_3_shadows_basic_w_bias from './A_Shadows/3_shadows_basic_w_bias'
 import webgl_10_4_shadows_w_spot_light from './A_Shadows/4_shadows_w_spot_light'
 import webgl_10_5_shadows_w_directional_light from './A_Shadows/5_shadows_w_directional_light'
+import webgl_15_1_instanced_drawing_not_instanced from './15_Optimization/1_instanced-drawing-not-instanced'
+import webgl_15_2_instanced_drawing from './15_Optimization/2_instanced-drawing'
+import webgl_15_3_instanced_drawing_projection_view from './15_Optimization/3_instanced-drawing-projection-view'
+import webgl_15_4_instanced_drawing_vao_not_instanced from './15_Optimization/4_instanced_drawing_vao_not_instanced'
+import webgl_15_5_instanced_drawing_vao from './15_Optimization/5_instanced_drawing_vao'
+import webgl_15_6_2d_rectangles_indexed from './15_Optimization/6_2d_rectangles_indexed'
+import webgl_15_7_2d_cross_indexed_rotate from './15_Optimization/7_2d_cross_indexed_rotate'
+import webgl_15_6_2d_cross_indexed from './15_Optimization/6.5_2d_cross_indexed'
+import webgl_15_8_instanced_drawing_vao_indexed_not_instanced from './15_Optimization/8_instanced_drawing_vao_indexed_not_instanced'
+import webgl_15_9_instanced_drawing_vao_indexed from './15_Optimization/9_instanced_drawing_vao_indexed'
 
 export {
     webgl_01_fundamental,
@@ -64,4 +74,14 @@ export {
     webgl_10_3_shadows_basic_w_bias,
     webgl_10_4_shadows_w_spot_light,
     webgl_10_5_shadows_w_directional_light,
+    webgl_15_1_instanced_drawing_not_instanced,
+    webgl_15_2_instanced_drawing,
+    webgl_15_3_instanced_drawing_projection_view,
+    webgl_15_4_instanced_drawing_vao_not_instanced,
+    webgl_15_5_instanced_drawing_vao,
+    webgl_15_6_2d_rectangles_indexed,
+    webgl_15_6_2d_cross_indexed,
+    webgl_15_7_2d_cross_indexed_rotate,
+    webgl_15_8_instanced_drawing_vao_indexed_not_instanced,
+    webgl_15_9_instanced_drawing_vao_indexed,
 }

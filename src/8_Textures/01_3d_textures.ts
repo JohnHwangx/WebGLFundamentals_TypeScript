@@ -84,8 +84,7 @@ export default function main() {
             return;
         }
 
-        webglUtils.resizeCanvasToDisplaySize(gl.canvas);
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+         
         gl.enable(gl.CULL_FACE);
         gl.enable(gl.DEPTH_TEST);
 
