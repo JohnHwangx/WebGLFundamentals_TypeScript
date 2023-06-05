@@ -111,12 +111,12 @@ export default function main() {
     gl.bufferData(gl.ARRAY_BUFFER, matrixData.byteLength, gl.DYNAMIC_DRAW);
   
     // set all 4 attributes for matrix
-    const bytesPerMatrix = 4 * 16;
-    for (let i = 0; i < 4; ++i) {
+    const bytesPerMatrix = 4 * 16;//这里的4是每个float4字节，16是16个数
+    for (let i = 0; i < 4; ++i) {//4行
         const loc = matrixLoc + i;
         gl.enableVertexAttribArray(loc);
         // note the stride and offset
-        const offset = i * 16;  // 4 floats per row, 4 bytes per float
+        const offset = i * 4 * 4;  // 4 floats per row, 4 bytes per float
         gl.vertexAttribPointer(
             loc,              // location
             4,                // size (num values to pull from buffer per iteration)

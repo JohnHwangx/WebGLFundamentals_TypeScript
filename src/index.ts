@@ -40,6 +40,7 @@ import webgl_15_7_2d_cross_indexed_rotate from './15_Optimization/7_2d_cross_ind
 import webgl_15_6_2d_cross_indexed from './15_Optimization/6.5_2d_cross_indexed'
 import webgl_15_8_instanced_drawing_vao_indexed_not_instanced from './15_Optimization/8_instanced_drawing_vao_indexed_not_instanced'
 import webgl_15_9_instanced_drawing_vao_indexed from './15_Optimization/9_instanced_drawing_vao_indexed'
+import webgl_15_10_2d_cross_indexed_vao_instanced from './15_Optimization/10_2d_cross_indexed_vao_instanced'
 
 export {
     webgl_01_fundamental,
@@ -84,4 +85,5 @@ export {
     webgl_15_7_2d_cross_indexed_rotate,
     webgl_15_8_instanced_drawing_vao_indexed_not_instanced,
     webgl_15_9_instanced_drawing_vao_indexed,
+    webgl_15_10_2d_cross_indexed_vao_instanced,
 }
