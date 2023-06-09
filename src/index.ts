@@ -41,6 +41,10 @@ import webgl_15_6_2d_cross_indexed from './15_Optimization/6.5_2d_cross_indexed'
 import webgl_15_8_instanced_drawing_vao_indexed_not_instanced from './15_Optimization/8_instanced_drawing_vao_indexed_not_instanced'
 import webgl_15_9_instanced_drawing_vao_indexed from './15_Optimization/9_instanced_drawing_vao_indexed'
 import webgl_15_10_2d_cross_indexed_vao_instanced from './15_Optimization/10_2d_cross_indexed_vao_instanced'
+import webgl_15_11_instanced_drawing_texture from './15_Optimization/11_instanced_drawing_texture'
+import webgl_15_12_instanced_drawing_texture_instanced from './15_Optimization/12_instanced_drawing_texture_instanced'
+import webgl_15_13_cube_vbo_subdata from './15_Optimization/13_cube_vbo_subdata'
+import webgl_15_14_cube_vbo_subdata_instanced from './15_Optimization/14_cube_vbo_subdata_instanced'
 
 export {
     webgl_01_fundamental,
@@ -86,4 +90,8 @@ export {
     webgl_15_8_instanced_drawing_vao_indexed_not_instanced,
     webgl_15_9_instanced_drawing_vao_indexed,
     webgl_15_10_2d_cross_indexed_vao_instanced,
+    webgl_15_11_instanced_drawing_texture,
+    webgl_15_12_instanced_drawing_texture_instanced,
+    webgl_15_13_cube_vbo_subdata,
+    webgl_15_14_cube_vbo_subdata_instanced,
 }
